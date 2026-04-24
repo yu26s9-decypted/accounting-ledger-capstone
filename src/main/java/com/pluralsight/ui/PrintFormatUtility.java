@@ -24,7 +24,7 @@ public class PrintFormatUtility {
                 "%-12s %-8s %-20s %-15s %-20s%n",
                 "DATE", "TIME", "DESCRIPTION", "VENDOR", "AMOUNT"
         );
-        System.out.println("----------------------------------------------------------------------------");
+    System.out.println("----------------------------------------------------------------------------");
     }
 
 }

@@ -46,21 +46,58 @@ public class Main {
                     addTransaction();
                     break;
                 case "L":
-                    listAllTransaction(transactionLedger);
+                    ledgerOptionMenuMsg();
                     System.out.printf("Case L");
                     break;
                 case "P":
                     makePayment();
                     break;
                 case "X":
-                    return;
             }
+                    return;
 
         } while (userInput != "X");
 
     }
 
+// Ledger Options
 
+    public static void ledgerOptionMenuMsg(){
+
+            String ledgerOptionMenu = """
+            What would you like to accomplish?
+            
+            Select an action.
+            
+            A. Display all ledger transaction
+            D. Display all deposits
+            P. Display all payments
+            R. View reports
+            H. Exit to home
+            """;
+
+            String userInput;
+        do {
+            System.out.printf("%n %n %n");
+            userInput = Console.askForString(ledgerOptionMenu).toUpperCase();
+
+            switch (userInput) {
+                case "A":
+                    listAllTransaction(transactionLedger);
+                    break;
+                case "D":
+                    displayDepositTransaction();
+                    break;
+                case "P":
+                    displayPaymentTransaction();
+                    break;
+                case "H":
+                    return;
+            }
+            return;
+
+        } while (userInput != "H");
+    }
 //    List transaction test
     public static void listAllTransaction(ArrayList<Transaction> transaction)
     {
@@ -160,6 +197,24 @@ public class Main {
             }
         } else {
             System.out.printf("This payment was discarded.");
+        }
+    }
+
+//    Display deposits only
+
+    public static void displayDepositTransaction(){
+        for(Transaction t : transactionLedger){
+            if(t.getAmount() > 0 ){
+                PrintFormatUtility.formattedTransaction(t);
+            }
+        }
+    }
+
+    public static void displayPaymentTransaction(){
+        for(Transaction t: transactionLedger) {
+            if(t.getAmount() < 0){
+                PrintFormatUtility.formattedTransaction(t);
+            }
         }
     }
 
