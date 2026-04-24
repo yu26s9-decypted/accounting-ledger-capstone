@@ -20,17 +20,25 @@ public class Main {
     public static void main(String[] arg) {
 
         String accountingLedgerHomeMenuMsg = """
+         
+                WELCOME TO STASH BUSINESS ACCOUNTING.
+                Stash Accounting, a division of Stash Banking, USA.
+                The bank for innovative companies.
                 
-                D.) Add Deposit -
+                What would you like to accomplish today?
+                
+                --------- Select an option. ---------
+                D.) Add Deposit
                 P.) Make Payment
                 L.) Ledger 
                 X.) Exit the application
-                
+                -------------------------------------
                 Enter your command:
                 """;
 
         String userInput;
         do {
+            System.out.printf("%n %n %n");
             userInput = Console.askForString(accountingLedgerHomeMenuMsg).toUpperCase();
 
             switch (userInput) {
@@ -40,6 +48,9 @@ public class Main {
                 case "L":
                     listAllTransaction(transactionLedger);
                     System.out.printf("Case L");
+                    break;
+                case "P":
+                    makePayment();
                     break;
                 case "X":
                     return;
@@ -66,26 +77,93 @@ public class Main {
     }
 
 
-    public static void addTransaction(){
+    public static void addTransaction()
+    {
 
-        Double depositAmount = Console.askForDouble("How much are you depositing: ");
+        boolean isAddingTransaction = true;
+
+        while (isAddingTransaction)
+        {
+            String depositAmount = Console.askForString("How much are you depositing?: ");
+            if(depositAmount.equalsIgnoreCase("x")){
+                System.out.printf("Exiting deposit.");
+                return;
+            }
+
+            Double convertDepToDouble = Double.parseDouble(depositAmount);
+
+            String depositDescription = Console.askForString("Description: ");
+            String depositVendor = Console.askForString("Vendor/Source of Deposit: ");
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss", Locale.US);
+            LocalDate date = LocalDate.now();
+            LocalTime time = LocalTime.now().withNano(0);
+            String fTime = formatter.format(time);
+
+            Transaction addNewTransaction = new Transaction(date, time, depositDescription, depositVendor, convertDepToDouble);
+
+
+            System.out.printf("PLEASE CONFIRM YOUR DEPOSIT.");
+            PrintFormatUtility.formattedTransaction(addNewTransaction);
+            String confirmTransaction = Console.askForString("Confirm this transaction? (y/n): ");
+
+            if(confirmTransaction.equalsIgnoreCase("Y")){
+                try {
+                    transactionFileManager.writeNewTransaction(addNewTransaction);
+                    System.out.printf("Your transaction has been saved to the csv.");
+                } catch (Exception e ){
+                    System.out.printf(e.getMessage());
+                }
+            } else {
+                System.out.printf("This transaction was discarded.");
+            }
+
+            String promptForAnotherDeposit = Console.askForString("would you like to add another transaction? (y/n): ");
+            if(promptForAnotherDeposit.equalsIgnoreCase("n")) {
+                isAddingTransaction = false;
+
+            }
+
+
+        }
+
+    }
+
+    public static void makePayment(){
+        boolean isMakingPayment = true;
+        String paymentAmount = Console.askForString("How much are you paying?: ");
+        if(paymentAmount.equalsIgnoreCase("x")){
+            System.out.printf("Exiting payment option.");
+            return;
+        }
+
+        Double convertDepToDouble = -Double.parseDouble(paymentAmount);
         String depositDescription = Console.askForString("Description: ");
         String depositVendor = Console.askForString("Vendor/Source of Deposit: ");
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss", Locale.US);
         LocalDate date = LocalDate.now();
         LocalTime time = LocalTime.now().withNano(0);
         String fTime = formatter.format(time);
-        System.out.println("Confirm to add these?" + date + time + depositDescription + depositVendor + depositAmount);
-        Transaction addNewTransaction = new Transaction(date, time, depositDescription, depositVendor, depositAmount);
-        try {
-            transactionFileManager.writeNewTransaction(addNewTransaction);
-        } catch (Exception e ){
-            System.out.printf(e.getMessage());
+
+        Transaction addNewTransaction = new Transaction(date, time, depositDescription, depositVendor, convertDepToDouble);
+
+
+        System.out.printf("PLEASE CONFIRM YOUR PAYMENT.");
+        PrintFormatUtility.formattedTransaction(addNewTransaction);
+        String confirmTransaction = Console.askForString("Confirm this payment? (y/n): ");
+
+        if(confirmTransaction.equalsIgnoreCase("Y")){
+            try {
+                transactionFileManager.writeNewTransaction(addNewTransaction);
+                System.out.printf("Your payment transaction has been saved to the csv.");
+            } catch (Exception e ){
+                System.out.printf(e.getMessage());
+            }
+        } else {
+            System.out.printf("This payment was discarded.");
         }
-
-
-
     }
+
+
 
 
 }
