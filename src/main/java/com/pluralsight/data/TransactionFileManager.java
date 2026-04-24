@@ -2,6 +2,7 @@ package com.pluralsight.data;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.Date;
 import java.sql.Time;
@@ -50,5 +51,23 @@ public class TransactionFileManager {
             System.out.printf("An error occured." + e.getMessage());
         }
         return transaction;
+    }
+
+    public void writeNewTransaction(Transaction transaction){
+        try {
+            FileWriter fileWriter = new FileWriter(this.transactionFileName, true);
+            String formattedTransactionLine = transaction.getDate() + "|" +
+                    transaction.getTime() + "|" +
+                    transaction.getDescription() + "|" +
+                    transaction.getVendor() + "|" +
+                    transaction.getAmount();
+
+            fileWriter.write(formattedTransactionLine + "\n");
+            fileWriter.close();
+
+
+        } catch (IOException e){
+            System.out.printf(e.getMessage());
+        }
     }
 }
