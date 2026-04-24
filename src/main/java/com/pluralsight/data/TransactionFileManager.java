@@ -34,7 +34,7 @@ public class TransactionFileManager {
                     String transactionVendor = transactionLine[3];
                     Double transactionAmount = Double.parseDouble(transactionLine[4]);
 
-                    Transaction t = new Transaction(transactionDate, transactionTime, transactionDescription, transactionVendor, transactionAmount);
+                    Transaction t = new Transaction(transactionDate.toLocalDate(), transactionTime.toLocalTime(), transactionDescription, transactionVendor, transactionAmount);
                     transaction.add(t);
 
 

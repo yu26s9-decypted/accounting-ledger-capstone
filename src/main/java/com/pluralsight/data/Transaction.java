@@ -1,37 +1,41 @@
 package com.pluralsight.data;
 
 import java.sql.Time;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 
 public class Transaction {
-    Date date;
-    Time time;
+    LocalDate date;
+    LocalTime time;
     String description;
     String vendor;
     Double amount;
 
-    public Transaction(Date date, Time time, String description, String vendor, Double amount) {
+    public Transaction(LocalDate date, LocalTime time, String description, String vendor, Double amount) {
         this.date = date;
         this.time = time;
         this.description = description;
         this.vendor = vendor;
         this.amount = amount;
     }
-    public Date getDate() {
+
+
+
+    public LocalDate getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(LocalDate date) {
         this.date = date;
     }
 
-    public Time getTime() {
+    public LocalTime getTime() {
         return time;
     }
 
     public void setTime(Time time) {
-        this.time = time;
+        this.time = time.toLocalTime();
     }
 
     public String getDescription() {
