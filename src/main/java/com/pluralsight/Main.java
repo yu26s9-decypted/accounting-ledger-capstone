@@ -1,31 +1,36 @@
 package com.pluralsight;
 
+import com.pluralsight.data.Transaction;
 import com.pluralsight.data.TransactionFileManager;
 import com.pluralsight.ui.Console;
+import com.pluralsight.ui.PrintFormatUtility;
+
+import java.util.ArrayList;
 
 public class Main {
     private final static TransactionFileManager transactionFileManager = new TransactionFileManager("src/main/java/com/pluralsight/data/transaction.csv");
-    public static void main(String[] arg){
+    private static ArrayList<Transaction> transactionLedger = transactionFileManager.loadAllTransaction();
+
+    public static void main(String[] arg) {
 
         String accountingLedgerHomeMenuMsg = """
                 
-                D.) Add Deposit - prompt user for the deposit information and save it
-                to the csv file
-                P) Make Payment (Debit) - prompt user for the debit information
-                and save it to the csv file
-                L) Ledger - display the ledger screen
-                X) Exit - exit the application
+                D.) Add Deposit -
+                P.) Make Payment
+                L.) Ledger 
+                X.) Exit the application
                 
                 Enter your command:
-                
                 """;
 
         String userInput;
         do {
-            userInput = Console.askForString(accountingLedgerHomeMenuMsg).toLowerCase();
+            userInput = Console.askForString(accountingLedgerHomeMenuMsg).toUpperCase();
 
-            switch (userInput){
+            switch (userInput) {
                 case "L":
+                    listAllTransaction(transactionLedger);
+                    System.out.printf("Case L");
                     break;
                 case "X":
                     return;
@@ -34,4 +39,16 @@ public class Main {
         } while (userInput != "X");
 
     }
+
+
+//    List transaction test
+    public static void listAllTransaction(ArrayList<Transaction> transaction){
+        int userInput;
+
+        PrintFormatUtility.printTransactionHeader();
+        for(Transaction t: transaction){
+            PrintFormatUtility.formattedTransaction(t);
+        }
+    }
+
 }
