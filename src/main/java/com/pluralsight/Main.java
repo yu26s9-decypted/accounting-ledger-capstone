@@ -8,8 +8,10 @@ import com.pluralsight.ui.PrintFormatUtility;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Locale;
 
 public class Main {
     private final static TransactionFileManager transactionFileManager = new TransactionFileManager("src/main/java/com/pluralsight/data/transaction.csv");
@@ -69,8 +71,10 @@ public class Main {
         Double depositAmount = Console.askForDouble("How much are you depositing: ");
         String depositDescription = Console.askForString("Description: ");
         String depositVendor = Console.askForString("Vendor/Source of Deposit: ");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss", Locale.US);
         LocalDate date = LocalDate.now();
-        LocalTime time = LocalTime.now();
+        LocalTime time = LocalTime.now().withNano(0);
+        String fTime = formatter.format(time);
         System.out.println("Confirm to add these?" + date + time + depositDescription + depositVendor + depositAmount);
         Transaction addNewTransaction = new Transaction(date, time, depositDescription, depositVendor, depositAmount);
         try {
