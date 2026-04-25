@@ -64,4 +64,15 @@ public class Console {
         }
     }
 
+    public static boolean promptForExit(String prompt, String exitKey){
+        String promptMsg = prompt + " (" + exitKey + " to exit. ):";
+        String userExitInput = Console.askForString(promptMsg);
+        if (userExitInput.equalsIgnoreCase(String.valueOf(exitKey))) {
+            System.out.printf("Returning you to the reporting menu...");
+            return true;
+
+        }
+        return false;
+    }
+
 }

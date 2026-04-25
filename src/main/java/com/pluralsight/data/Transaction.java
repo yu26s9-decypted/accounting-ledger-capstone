@@ -22,6 +22,7 @@ public class Transaction {
 
 
 
+
     public LocalDate getDate() {
         return date;
     }
@@ -62,6 +63,7 @@ public class Transaction {
         this.amount = amount;
     }
 
+
     @Override
     public String toString() {
         return  "Date is..." + date +
@@ -70,6 +72,7 @@ public class Transaction {
                 "Vendor:" + vendor +
                 "Amount:" + amount;
     }
+
 
 
 

@@ -5,12 +5,10 @@ import com.pluralsight.data.TransactionFileManager;
 import com.pluralsight.ui.Console;
 import com.pluralsight.ui.PrintFormatUtility;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Locale;
 
 public class Main {
@@ -20,7 +18,7 @@ public class Main {
     public static void main(String[] arg) {
 
         String accountingLedgerHomeMenuMsg = """
-         
+                
                 WELCOME TO STASH BUSINESS ACCOUNTING.
                 Stash Accounting, a division of Stash Banking, USA.
                 The bank for innovative companies.
@@ -47,36 +45,35 @@ public class Main {
                     break;
                 case "L":
                     ledgerOptionMenuMsg();
-                    System.out.printf("Case L");
                     break;
                 case "P":
                     makePayment();
                     break;
                 case "X":
-            }
                     return;
+            }
 
-        } while (userInput != "X");
+        } while (userInput.equalsIgnoreCase("X") );
 
     }
 
 // Ledger Options
 
-    public static void ledgerOptionMenuMsg(){
+    public static void ledgerOptionMenuMsg() {
 
-            String ledgerOptionMenu = """
-            What would you like to accomplish?
-            
-            Select an action.
-            
-            A. Display all ledger transaction
-            D. Display all deposits
-            P. Display all payments
-            R. View reports
-            H. Exit to home
-            """;
+        String ledgerOptionMenu = """
+                STASH // LEDGER MENU
+              
+                Select an action.
+                
+                A. Display all ledger transaction
+                D. Display all deposits
+                P. Display all payments
+                R. View reports
+                H. Exit to home
+                """;
 
-            String userInput;
+        String userInput;
         do {
             System.out.printf("%n %n %n");
             userInput = Console.askForString(ledgerOptionMenu).toUpperCase();
@@ -91,38 +88,46 @@ public class Main {
                 case "P":
                     displayPaymentTransaction();
                     break;
+                case "R":
+                    reportMenuOption();
+                    break;
                 case "H":
                     return;
             }
-            return;
 
-        } while (userInput != "H");
+
+        } while (userInput.equalsIgnoreCase("H"));
     }
-//    List transaction test
-    public static void listAllTransaction(ArrayList<Transaction> transaction)
-    {
 
-        int transactionResult = Integer.parseInt(String.valueOf(transaction.size()));
-        PrintFormatUtility.printTransactionHeader();
-        System.out.printf("You have %d " + ((transactionResult == 1 ? "transaction" : "transactions") + "\n"), transactionResult);
+    //    List transaction test
+    public static void listAllTransaction(ArrayList<Transaction> transaction) {
 
-        for(Transaction t: transaction){
-            PrintFormatUtility.formattedTransaction(t);
+        while (true) {
+            int transactionResult = Integer.parseInt(String.valueOf(transaction.size()));
+            PrintFormatUtility.printTransactionHeader();
+            System.out.printf("You have %d " + ((transactionResult == 1 ? "transaction" : "transactions") + "\n"), transactionResult);
 
+            for (Transaction t : transaction) {
+                PrintFormatUtility.formattedTransaction(t);
+            }
+
+
+            String userExitCommand = Console.askForString("Press x to exit once you are done viewing").toUpperCase();
+            if (userExitCommand.equalsIgnoreCase("X")) {
+                return;
+            }
         }
 
     }
 
 
-    public static void addTransaction()
-    {
+    public static void addTransaction() {
 
         boolean isAddingTransaction = true;
 
-        while (isAddingTransaction)
-        {
+        while (isAddingTransaction) {
             String depositAmount = Console.askForString("How much are you depositing?: ");
-            if(depositAmount.equalsIgnoreCase("x")){
+            if (depositAmount.equalsIgnoreCase("x")) {
                 System.out.printf("Exiting deposit.");
                 return;
             }
@@ -143,11 +148,11 @@ public class Main {
             PrintFormatUtility.formattedTransaction(addNewTransaction);
             String confirmTransaction = Console.askForString("Confirm this transaction? (y/n): ");
 
-            if(confirmTransaction.equalsIgnoreCase("Y")){
+            if (confirmTransaction.equalsIgnoreCase("Y")) {
                 try {
                     transactionFileManager.writeNewTransaction(addNewTransaction);
                     System.out.printf("Your transaction has been saved to the csv.");
-                } catch (Exception e ){
+                } catch (Exception e) {
                     System.out.printf(e.getMessage());
                 }
             } else {
@@ -155,7 +160,7 @@ public class Main {
             }
 
             String promptForAnotherDeposit = Console.askForString("would you like to add another transaction? (y/n): ");
-            if(promptForAnotherDeposit.equalsIgnoreCase("n")) {
+            if (promptForAnotherDeposit.equalsIgnoreCase("n")) {
                 isAddingTransaction = false;
 
             }
@@ -165,10 +170,10 @@ public class Main {
 
     }
 
-    public static void makePayment(){
+    public static void makePayment() {
         boolean isMakingPayment = true;
         String paymentAmount = Console.askForString("How much are you paying?: ");
-        if(paymentAmount.equalsIgnoreCase("x")){
+        if (paymentAmount.equalsIgnoreCase("x")) {
             System.out.printf("Exiting payment option.");
             return;
         }
@@ -188,11 +193,11 @@ public class Main {
         PrintFormatUtility.formattedTransaction(addNewTransaction);
         String confirmTransaction = Console.askForString("Confirm this payment? (y/n): ");
 
-        if(confirmTransaction.equalsIgnoreCase("Y")){
+        if (confirmTransaction.equalsIgnoreCase("Y")) {
             try {
                 transactionFileManager.writeNewTransaction(addNewTransaction);
                 System.out.printf("Your payment transaction has been saved to the csv.");
-            } catch (Exception e ){
+            } catch (Exception e) {
                 System.out.printf(e.getMessage());
             }
         } else {
@@ -202,18 +207,95 @@ public class Main {
 
 //    Display deposits only
 
-    public static void displayDepositTransaction(){
-        for(Transaction t : transactionLedger){
-            if(t.getAmount() > 0 ){
+    public static void displayDepositTransaction() {
+        for (Transaction t : transactionLedger) {
+            if (t.getAmount() > 0) {
                 PrintFormatUtility.formattedTransaction(t);
             }
         }
     }
 
-    public static void displayPaymentTransaction(){
-        for(Transaction t: transactionLedger) {
-            if(t.getAmount() < 0){
+    // Display payment transaction
+
+    public static void displayPaymentTransaction() {
+        for (Transaction t : transactionLedger) {
+            if (t.getAmount() < 0) {
                 PrintFormatUtility.formattedTransaction(t);
+            }
+        }
+    }
+
+    public static void reportMenuOption() {
+        String ledgerReportMenuOption = """
+                WELCOME TO STASH BUSINESS ACCOUNTING.
+                
+                
+                STASH // BUSINESS REPORTING SUITE®
+                
+                Select an option.
+                
+                1. View month to date report
+                2. View previous month report
+                3. View Year-To-Date report
+                4. View Previous Year report
+                5. View Searh by Vendor
+                0. Back - Return to the ledger page.
+                H. Return to home.
+                """;
+
+        String userInput;
+        do {
+            System.out.printf("%n %n %n");
+            userInput = Console.askForString(ledgerReportMenuOption).toUpperCase();
+
+            switch (userInput) {
+                case "1":
+                    viewMonthToDateReport();
+                    break;
+                case "2":
+                    //todo
+                    break;
+                case "3":
+                    //todo
+                    break;
+                case "4":
+                    // todo
+                    break;
+                case "5":
+                    //todo
+                    break;
+                case "0":
+                    break;
+                case "H":
+                    //todo
+                    return;
+
+            }
+
+
+        } while (userInput != "H");
+    }
+
+
+    public static void viewMonthToDateReport() {
+
+        while (true){
+            LocalDate today = LocalDate.now();
+            LocalDate startOfMoth = today.withDayOfMonth(1);
+
+            System.out.printf("Today: %s Month: %s %n", today, startOfMoth);
+
+            for (Transaction t : transactionLedger){
+                LocalDate transactionDate = t.getDate();
+
+                if(transactionDate.isBefore(today) && transactionDate.isAfter(startOfMoth)){
+                    PrintFormatUtility.formattedTransaction(t);
+                }
+            }
+
+            boolean exit =  Console.promptForExit("Press to exit", "x");
+            if(exit){
+                return;
             }
         }
     }

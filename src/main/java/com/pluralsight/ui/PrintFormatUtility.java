@@ -4,6 +4,7 @@ import com.pluralsight.data.Transaction;
 
 public class PrintFormatUtility {
     public static void formattedTransaction(Transaction t){
+
         System.out.printf("%-12s %-8s %-20s %-10s $%10.2f \n",
                 t.getDate(),
                 t.getTime(),
@@ -26,5 +27,6 @@ public class PrintFormatUtility {
         );
     System.out.println("----------------------------------------------------------------------------");
     }
+
 
 }
