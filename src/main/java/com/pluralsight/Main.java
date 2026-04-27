@@ -52,7 +52,7 @@ public class Main {
                     return;
             }
 
-        } while (userInput.equalsIgnoreCase("X") );
+        } while (!userInput.equalsIgnoreCase("X") );
 
     }
 
@@ -88,7 +88,11 @@ public class Main {
                     displayPaymentTransaction();
                     break;
                 case "R":
-                    reportMenuOption();
+                    String r = reportMenuOption();
+
+                    if (r.equals("HOME")) {
+                        return;
+                    }
                     break;
                 case "H":
                     return;
@@ -97,6 +101,8 @@ public class Main {
 
         } while (true);
     }
+
+
 
     //    List transaction test
     public static void listAllTransaction(ArrayList<Transaction> transaction) {
@@ -224,7 +230,7 @@ public class Main {
         }
     }
 
-    public static void reportMenuOption() {
+    public static String reportMenuOption() {
         String ledgerReportMenuOption = """
                 WELCOME TO STASH BUSINESS ACCOUNTING.
                 
@@ -242,9 +248,8 @@ public class Main {
                 H. Return to home.
                 
                 Enter your command: ›""";
-
         String userInput;
-        do {
+        while(true) {
             System.out.printf("%n %n %n");
             userInput = Console.askForString(ledgerReportMenuOption).toUpperCase();
 
@@ -265,13 +270,15 @@ public class Main {
                     filterByVendor();
                     break;
                 case "0":
-                    break;
+                    return "LEDGER";
                 case "H":
-                    return;
+                    return "HOME";
+                default:
+                    System.out.printf("Invalid option");
 
             }
 
-        } while (userInput != "H");
+        }
     }
 
 
@@ -293,7 +300,6 @@ public class Main {
 
             boolean exit =  Console.promptForExit("Press to exit", "x");
             if(exit){
-
                 return;
             }
         }
@@ -320,7 +326,9 @@ public class Main {
 
         }
         boolean exit = Console.promptForExit("Press to exit", "x");
-        if (exit);
+        if (exit) {
+            return;
+        }
     }
 
     public static void viewYearToDate() {
@@ -355,7 +363,9 @@ public class Main {
         }
 
         boolean exit = Console.promptForExit("Press to exit", "x");
-        if (exit);
+        if (exit) {
+            return;
+        };
 
     }
 
@@ -378,17 +388,16 @@ public class Main {
 
             if(!vendorExist)
             {
-                System.out.printf("Vendor could not be found");
+                System.out.printf("Vendor could not be found. \n");
             }
         } catch (Exception e){
             System.out.printf(e.getMessage());
         }
+        boolean exit = Console.promptForExit("Press to exit", "x");
+        if (exit) {
+            return;
+        };
     }
-
-
-
-
-
 
 
 }
