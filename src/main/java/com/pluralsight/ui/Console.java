@@ -24,7 +24,7 @@ public class Console {
 
     public static String askForString(String prompt) {
         System.out.print(prompt);
-        return scanner.nextLine();
+        return scanner.nextLine().trim();
     }
 
 
@@ -68,9 +68,12 @@ public class Console {
         String promptMsg = prompt + " (" + exitKey + " to exit. ):";
         String userExitInput = Console.askForString(promptMsg);
         if (userExitInput.equalsIgnoreCase(String.valueOf(exitKey))) {
-            System.out.printf("Returning you to the reporting menu...");
+            System.out.printf("Returning you to menu...");
             return true;
 
+        } else {
+            System.out.printf("\nDid you make a mistake? The exit key is %s\n", exitKey);
+            scanner.nextLine();
         }
         return false;
     }

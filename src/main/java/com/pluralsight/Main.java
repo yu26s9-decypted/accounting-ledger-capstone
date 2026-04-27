@@ -31,8 +31,7 @@ public class Main {
                 L.) Ledger 
                 X.) Exit the application
                 -------------------------------------
-                Enter your command:
-                """;
+                Enter your command: ›""";
 
         String userInput;
         do {
@@ -71,8 +70,8 @@ public class Main {
                 P. Display all payments
                 R. View reports
                 H. Exit to home
-                """;
-
+                
+                Enter a command: ›""";
         String userInput;
         do {
             System.out.printf("%n %n %n");
@@ -96,7 +95,7 @@ public class Main {
             }
 
 
-        } while (userInput.equalsIgnoreCase("H"));
+        } while (true);
     }
 
     //    List transaction test
@@ -112,10 +111,10 @@ public class Main {
             }
 
 
-            String userExitCommand = Console.askForString("Press x to exit once you are done viewing").toUpperCase();
-            if (userExitCommand.equalsIgnoreCase("X")) {
-                return;
-            }
+            boolean exit = Console.promptForExit("Press to exit", "x");
+            if (exit)
+                break;
+
         }
 
     }
@@ -241,7 +240,8 @@ public class Main {
                 5. View Searh by Vendor
                 0. Back - Return to the ledger page.
                 H. Return to home.
-                """;
+                
+                Enter your command: ›""";
 
         String userInput;
         do {
@@ -253,7 +253,7 @@ public class Main {
                     viewMonthToDateReport();
                     break;
                 case "2":
-                    //todo
+                    viewPrevMonth();
                     break;
                 case "3":
                     //todo
@@ -267,11 +267,9 @@ public class Main {
                 case "0":
                     break;
                 case "H":
-                    //todo
                     return;
 
             }
-
 
         } while (userInput != "H");
     }
@@ -283,7 +281,7 @@ public class Main {
             LocalDate today = LocalDate.now();
             LocalDate startOfMoth = today.withDayOfMonth(1);
 
-            System.out.printf("Today: %s Month: %s %n", today, startOfMoth);
+            System.out.printf("Month to Date Overview: %s Month: %s %n", today, startOfMoth);
 
             for (Transaction t : transactionLedger){
                 LocalDate transactionDate = t.getDate();
@@ -295,10 +293,39 @@ public class Main {
 
             boolean exit =  Console.promptForExit("Press to exit", "x");
             if(exit){
+
                 return;
             }
         }
     }
+
+    public static void viewPrevMonth() {
+        LocalDate today = LocalDate.now();
+        LocalDate previousMonthStartDate = LocalDate.now().minusMonths(1).withDayOfMonth(1);
+        LocalDate endMonth = previousMonthStartDate.withDayOfMonth(previousMonthStartDate.lengthOfMonth());
+
+        System.out.printf("Previous Month Overview:");
+
+        for (Transaction t : transactionLedger) {
+            LocalDate transactionDate = t.getDate();
+
+            PrintFormatUtility.printTransactionHeader();
+
+            if (!transactionDate.isBefore(previousMonthStartDate) && !transactionDate.isAfter(endMonth)) {
+                PrintFormatUtility.formattedTransaction(t);
+            }
+
+
+        }
+        boolean exit = Console.promptForExit("Press to exit", "x");
+        if (exit);
+    }
+
+    public static void viewYearToDate() {
+        LocalDate today = LocalDate.now();
+        LocalDate previousYear = LocalDate.now().minusYears(1);
+    }
+
 
 
 

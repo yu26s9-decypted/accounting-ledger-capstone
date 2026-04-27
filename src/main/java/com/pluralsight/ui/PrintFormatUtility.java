@@ -5,13 +5,16 @@ import com.pluralsight.data.Transaction;
 public class PrintFormatUtility {
     public static void formattedTransaction(Transaction t){
 
-        System.out.printf("%-12s %-8s %-20s %-10s $%10.2f \n",
+        String sign = ((t.getAmount()) < 0 ? "-" : "");
+
+
+        System.out.printf("%-12s %-15s %-40s %-25s %10s$%.2f%n",
                 t.getDate(),
                 t.getTime(),
                 t.getDescription(),
                 t.getVendor(),
-                t.getAmount()
-
+                sign,
+                Math.abs(t.getAmount())
                 );
     }
 
@@ -22,11 +25,13 @@ public class PrintFormatUtility {
         System.out.printf("\n");
 
         System.out.printf(
-                "%-12s %-8s %-20s %-15s %-20s%n",
+                "%-12s %-15s %-40s %-25s %15s%n",
                 "DATE", "TIME", "DESCRIPTION", "VENDOR", "AMOUNT"
         );
-    System.out.println("----------------------------------------------------------------------------");
+    System.out.println("---------------------------------------------------------------------------------------------------------------------------");
     }
+
+
 
 
 }
