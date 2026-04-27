@@ -29,7 +29,7 @@ public class Main {
                 --------- Select an option. ---------
                 D.) Add Deposit
                 P.) Make Payment
-                L.) Ledger 
+                L.) Ledger
                 X.) Exit the application
                 -------------------------------------
                 Enter your command: ›""";
@@ -59,7 +59,8 @@ public class Main {
 
 // Ledger Options
 
-    public static void ledgerOptionMenuMsg() {
+    public static void ledgerOptionMenuMsg()
+    {
 
         String ledgerOptionMenu = """
                 STASH // LEDGER MENU
@@ -78,7 +79,8 @@ public class Main {
             System.out.printf("%n %n %n");
             userInput = Console.askForString(ledgerOptionMenu).toUpperCase();
 
-            switch (userInput) {
+            switch (userInput)
+            {
                 case "A":
                     listAllTransaction(transactionLedger);
                     break;
@@ -89,17 +91,11 @@ public class Main {
                     displayPaymentTransaction();
                     break;
                 case "R":
-                    String r = reportMenuOption();
-
-                    if (r.equals("HOME")) {
-                        return;
-                    }
+                    reportMenuOption();
                     break;
                 case "H":
                     return;
             }
-
-
         } while (true);
     }
 
@@ -138,7 +134,8 @@ public class Main {
         boolean isAddingTransaction = true;
 
         while (isAddingTransaction) {
-            String depositAmount = Console.askForString("How much are you depositing?: ");
+            String depositAmount = Console.askForString("How much are you depositing? (press x to exit): ");
+
             if (depositAmount.equalsIgnoreCase("x")) {
                 System.out.printf("Exiting deposit.");
                 return;
@@ -172,33 +169,41 @@ public class Main {
             }
 
             String promptForAnotherDeposit = Console.askForString("would you like to add another transaction? (y/n): ");
+
             if (promptForAnotherDeposit.equalsIgnoreCase("n")) {
                 isAddingTransaction = false;
-
             }
-
-
         }
-
     }
 
     public static void makePayment() {
         boolean isMakingPayment = true;
-        String paymentAmount = Console.askForString("How much are you paying?: ");
-        if (paymentAmount.equalsIgnoreCase("x")) {
-            System.out.printf("Exiting payment option.");
-            return;
+        boolean validAmount = false;
+        Double convertDepositToDouble = 0.00;
+
+        while (!validAmount){
+            try {
+                String paymentAmount = Console.askForString("How much are you paying? (press x to exit): ");
+                convertDepositToDouble = -Double.parseDouble(paymentAmount);
+                validAmount = true;
+                if (paymentAmount.equalsIgnoreCase("x")) {
+                    System.out.printf("Exiting payment option.");
+                    return;
+                }
+
+            } catch (Exception e){
+                System.out.println("Your input was invalid. Please try again");
+            }
         }
 
-        Double convertDepToDouble = -Double.parseDouble(paymentAmount);
         String depositDescription = Console.askForString("Description: ");
         String depositVendor = Console.askForString("Vendor/Source of Deposit: ");
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss", Locale.US);
         LocalDate date = LocalDate.now();
         LocalTime time = LocalTime.now().withNano(0);
-        String fTime = formatter.format(time);
 
-        Transaction addNewTransaction = new Transaction(date, time, depositDescription, depositVendor, convertDepToDouble);
+
+        Transaction addNewTransaction = new Transaction(date, time, depositDescription, depositVendor, convertDepositToDouble);
 
 
         System.out.printf("PLEASE CONFIRM YOUR PAYMENT.");
@@ -212,7 +217,8 @@ public class Main {
             } catch (Exception e) {
                 System.out.printf(e.getMessage());
             }
-        } else {
+        } else
+        {
             System.out.printf("This payment was discarded.");
         }
     }
@@ -224,9 +230,6 @@ public class Main {
             if (t.getAmount() > 0) {
                 PrintFormatUtility.formattedTransaction(t);
             }
-
-
-
         }
         boolean exit = Console.promptForExit("Press to exit", "x");
         if (exit) {
@@ -248,7 +251,7 @@ public class Main {
         };
     }
 
-    public static String reportMenuOption() {
+    public static void reportMenuOption() {
         String ledgerReportMenuOption = """
                 WELCOME TO STASH BUSINESS ACCOUNTING.
                 
@@ -289,12 +292,12 @@ public class Main {
                     filterByVendor();
                     break;
                 case "6":
-                    filterByCustomSearch();
+                    // Challenge
                     break;
                 case "0":
-                    return "LEDGER";
+                    return;
                 case "H":
-                    return "HOME";
+                    return;
                 default:
                     System.out.printf("Invalid option");
 
@@ -330,7 +333,6 @@ public class Main {
     // bug: not printing view previous month.
 
     public static void viewPrevMonth() {
-        LocalDate today = LocalDate.now();
         LocalDate previousMonthStartDate = LocalDate.now().minusMonths(1).withDayOfMonth(1);
         LocalDate endMonth = previousMonthStartDate.withDayOfMonth(previousMonthStartDate.lengthOfMonth());
 
@@ -418,44 +420,5 @@ public class Main {
             return;
         };
     }
-
-    public static void filterByCustomSearch(){
-        String startDate = Console.askForString("Start date (format: mm/dd/yyyy) : ");
-        String endDate = Console.askForString("End Date (format: mm/dd/yyyy): ");
-        String askForDescription = Console.askForString("Description:");
-        String askForVendor = Console.askForString("Vendor: ");
-        double askForAmount = Console.askForDouble("Amount: ");
-
-
-
-
-
-
-        System.out.printf(formatDate(startDate));
-
-
-
-
-        for(Transaction t : transactionLedger){
-
-        }
-
-
-    }
-
-    public static String formatDate(String date){
-        String[] split = date.split("/");
-        String formattedStartDate = split[2] + "-" +
-                split[0] + "-" +
-                split[1];
-        return formattedStartDate;
-    }
-
-
-
-
-
-
-
 
 }
