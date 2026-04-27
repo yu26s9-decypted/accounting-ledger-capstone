@@ -256,7 +256,7 @@ public class Main {
                     viewPrevMonth();
                     break;
                 case "3":
-                    //todo
+                    viewYearToDate();
                     break;
                 case "4":
                     // todo
@@ -299,19 +299,21 @@ public class Main {
         }
     }
 
+    // bug: not printing view previous month.
+
     public static void viewPrevMonth() {
         LocalDate today = LocalDate.now();
         LocalDate previousMonthStartDate = LocalDate.now().minusMonths(1).withDayOfMonth(1);
         LocalDate endMonth = previousMonthStartDate.withDayOfMonth(previousMonthStartDate.lengthOfMonth());
 
         System.out.printf("Previous Month Overview:");
-
+        PrintFormatUtility.printTransactionHeader();
         for (Transaction t : transactionLedger) {
             LocalDate transactionDate = t.getDate();
 
-            PrintFormatUtility.printTransactionHeader();
 
-            if (!transactionDate.isBefore(previousMonthStartDate) && !transactionDate.isAfter(endMonth)) {
+
+            if (transactionDate.isBefore(endMonth) && transactionDate.isAfter(previousMonthStartDate) || transactionDate.isEqual(previousMonthStartDate)) {
                 PrintFormatUtility.formattedTransaction(t);
             }
 
@@ -323,7 +325,18 @@ public class Main {
 
     public static void viewYearToDate() {
         LocalDate today = LocalDate.now();
-        LocalDate previousYear = LocalDate.now().minusYears(1);
+        LocalDate previousYear = LocalDate.now().withDayOfYear(1);
+        PrintFormatUtility.printTransactionHeader();
+
+        for(Transaction t : transactionLedger) {
+            LocalDate transactionDate = t.getDate();
+            if (transactionDate.isBefore(today) && transactionDate.isAfter(previousYear)) {
+                PrintFormatUtility.formattedTransaction(t);
+            }
+
+        }
+
+
     }
 
 
