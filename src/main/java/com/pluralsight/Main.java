@@ -259,7 +259,7 @@ public class Main {
                     viewYearToDate();
                     break;
                 case "4":
-                    // todo
+                    viewPrevYear();
                     break;
                 case "5":
                     //todo
@@ -335,7 +335,27 @@ public class Main {
             }
 
         }
+        boolean exit = Console.promptForExit("Press to exit", "x");
+        if (exit);
 
+
+    }
+
+    public static void viewPrevYear(){
+        LocalDate startOfLastYear = LocalDate.now().minusYears(1).withDayOfYear(1);
+        LocalDate endOfLastYear = LocalDate.now().minusYears(1).withMonth(12).withDayOfMonth(31);
+
+
+        for(Transaction t: transactionLedger){
+            LocalDate transactionDate = t.getDate();
+
+            if(transactionDate.isBefore(endOfLastYear) && transactionDate.isAfter(startOfLastYear)){
+                PrintFormatUtility.formattedTransaction(t);
+            }
+        }
+
+        boolean exit = Console.promptForExit("Press to exit", "x");
+        if (exit);
 
     }
 
