@@ -262,7 +262,7 @@ public class Main {
                     viewPrevYear();
                     break;
                 case "5":
-                    //todo
+                    filterByVendor();
                     break;
                 case "0":
                     break;
@@ -358,6 +358,34 @@ public class Main {
         if (exit);
 
     }
+
+    public static void filterByVendor(){
+        try {
+
+            String userSearchTerm = Console.askForString("Search for a vendor:");
+            boolean vendorExist = false;
+
+
+
+            for (Transaction t : transactionLedger)
+            {
+                if(t.getVendor().equalsIgnoreCase(userSearchTerm)){
+                    PrintFormatUtility.formattedTransaction(t);
+                    vendorExist = true;
+                }
+
+            }
+
+            if(!vendorExist)
+            {
+                System.out.printf("Vendor could not be found");
+            }
+        } catch (Exception e){
+            System.out.printf(e.getMessage());
+        }
+    }
+
+
 
 
 
