@@ -14,36 +14,40 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Date;
 
 public class Main {
-    private final static TransactionFileManager transactionFileManager = new TransactionFileManager("src/main/java/com/pluralsight/data/transaction.csv");
+    private final static TransactionFileManager transactionFileManager = new TransactionFileManager("files/transaction.csv");
     private static ArrayList<Transaction> transactionLedger = transactionFileManager.loadAllTransaction();
 
-    public static void main(String[] arg) {
+    public static void main(String[] arg)
+    {
 
         if(arg.length > 0 && arg[0].equalsIgnoreCase("--GUI")){
             //do the gui
             System.out.println("GUI");
         }
-        else{
+
+        else {
 
             String accountingLedgerHomeMenuMsg = """
                 
-                WELCOME TO STASH BUSINESS ACCOUNTING.
-                Stash Accounting, a division of Stash Banking, USA.
-                The bank for innovative companies.
+                \tWELCOME TO STASH BUSINESS ACCOUNTING.
+                \tStash Accounting, a division of Stash Banking, USA.
+                \tThe bank for innovative companies.
                 
-                What would you like to accomplish today?
+                \tWhat would you like to accomplish today?
                 
-                --------- Select an option. ---------
-                D.) Add Deposit
-                P.) Make Payment
-                L.) Ledger
-                S.) AI Summarize
-                X.) Exit the application
-                -------------------------------------
+                \t--------- Select an option. ---------
+                \tD.) Add Deposit
+                \tP.) Make Payment
+                \tL.) Ledger
+                \tS.) AI Summarize
+                \tX.) Exit the application
+                \t-------------------------------------
                 Enter your command: ›""";
 
             String userInput;
@@ -52,20 +56,14 @@ public class Main {
                 userInput = Console.askForString(accountingLedgerHomeMenuMsg).toUpperCase();
 
                 switch (userInput) {
-                    case "D":
-                        addTransactionOfDeposit();
-                        break;
-                    case "L":
-                        ledgerOptionMenuMsg();
-                        break;
-                    case "P":
-                        addTransactionOfPayment();
-                        break;
-                    case "S":
-                        useAISummarizer();
-                        break;
-                    case "X":
+                    case "D" -> addTransactionOfDeposit();
+                    case "L" -> ledgerOptionMenuMsg();
+                    case "P" -> addTransactionOfPayment();
+                    case "S" -> useAISummarizer();
+                    case "X" -> {
+                        System.out.println("Thank you for visiting Stash Accounting!");
                         return;
+                    }
                 }
 
             } while (!userInput.equalsIgnoreCase("X") );
@@ -80,15 +78,15 @@ public class Main {
     {
 
         String ledgerOptionMenu = """
-                STASH // LEDGER MENU
+                \tSTASH // LEDGER MENU
               
-                Select an action.
+                \tSelect an action.
                 
-                A. Display all ledger transaction
-                D. Display all deposits
-                P. Display all payments
-                R. View reports
-                H. Exit to home
+                \tA. Display all ledger transaction
+                \tD. Display all deposits
+                \tP. Display all payments
+                \tR. View reports
+                \tH. Exit to home
                 
                 Enter a command: ›""";
         String userInput;
@@ -98,23 +96,17 @@ public class Main {
 
             switch (userInput)
             {
-                case "A":
-                    listAllTransaction(transactionLedger);
-                    break;
-                case "D":
-                    displayDepositTransaction();
-                    break;
-                case "P":
-                    displayPaymentTransaction();
-                    break;
-                case "R":
-                    reportMenuOption();
-                    break;
-                case "H":
+                case "A" -> listAllTransaction(transactionLedger);
+                case "D" -> displayDepositTransaction();
+                case "P" -> displayPaymentTransaction();
+                case "R" -> reportMenuOption();
+                case "H" -> {
                     return;
+                }
             }
         } while (true);
     }
+
 
 
 
@@ -216,8 +208,10 @@ public class Main {
         boolean isMakingPayment = true;
         boolean validAmount = false;
         Double convertDepositToDouble = 0.00;
-
-        while (!validAmount){
+        LocalDate date = null;
+        LocalTime time  = null;
+        while (!validAmount)
+        {
             try {
                 String paymentAmount = Console.askForString("How much are you paying? (press x to exit): ");
                 convertDepositToDouble = -Double.parseDouble(paymentAmount);
@@ -232,10 +226,81 @@ public class Main {
             }
         }
 
+        boolean validDate = false;
+
+        String transactionTimeOption = """
+                \tWhat time do you want to log?
+                
+                
+                \t[1] Current Time
+                \t[2] Custom Time
+                
+                Enter your command› :""";
+
+        while(!validDate){
+
+
+           int userInput = Console.askForInt(transactionTimeOption,1,2);
+
+           if(userInput == 1){
+                date = LocalDate.now();
+                time = LocalTime.now().withNano(0);
+           } else if  (userInput == 2)
+           {
+               DateTimeFormatter format1 = DateTimeFormatter.ofPattern("M/d/yyyy");
+               DateTimeFormatter format2 = DateTimeFormatter.ofPattern("MMMM d yyyy");
+               DateTimeFormatter format3 = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+
+               boolean parsedDate = false;
+
+               while(!parsedDate)
+               {
+
+                   String askDate = Console.askForString("Enter the date of the transaction:");
+
+                   try {
+                       date = LocalDate.parse(askDate, format1);
+                       parsedDate = true;
+                   } catch (Exception error1){
+                       try {
+                           date = LocalDate.parse(askDate, format2);
+                           parsedDate = true;
+                       } catch (Exception error2){
+                           try {
+                               date = LocalDate.parse(askDate, format3);
+                               parsedDate = true;
+                           } catch (Exception error3){
+                               System.out.println("Invalid date time format. Please try again. Error Message: \n" + error3.getMessage());
+
+                           }
+                       }
+                   }
+               }
+
+
+               boolean parsedTime = false;
+
+               while(!parsedTime) {
+                   try {
+                       String askTime = Console.askForString("Enter the time of the transaction");
+                       DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+                        time = LocalTime.parse(askTime, timeFormatter);
+                        parsedTime = true;
+                   } catch (Exception e){
+                       System.out.println("Invalid time format. Please try again. (Valid format example: 12:30:25)");
+                   }
+               }
+
+
+               validDate = true;
+
+           }
+       }
+
+
         String depositDescription = Console.askForString("Description: ");
         String depositVendor = Console.askForString("Vendor/Source of Deposit: ");
-        LocalDate date = LocalDate.now();
-        LocalTime time = LocalTime.now().withNano(0);
 
 
         Transaction addNewTransaction = new Transaction(date, time, depositDescription, depositVendor, convertDepositToDouble);
@@ -285,21 +350,21 @@ public class Main {
 
     public static void reportMenuOption() {
         String ledgerReportMenuOption = """
-                WELCOME TO STASH BUSINESS ACCOUNTING.
+                \tWELCOME TO STASH BUSINESS ACCOUNTING.
                 
                 
-                STASH // BUSINESS REPORTING SUITE®
+                \tSTASH // BUSINESS REPORTING SUITE®
                 
-                Select an option.
+                \tSelect an option.
                 
-                1. View month to date report
-                2. View previous month report
-                3. View Year-To-Date report
-                4. View Previous Year report
-                5. View Searh by Vendor
-                6. Custom Search
-                0. Back - Return to the ledger page.
-                H. Return to home.
+                \t1. View month to date report
+                \t2. View previous month report
+                \t3. View Year-To-Date report
+                \t4. View Previous Year report
+                \t5. View Searh by Vendor
+                \t6. Custom Search
+                \t0. Back - Return to the ledger page.
+                \tH. Return to home.
                 
                 Enter your command: ›""";
         String userInput;
@@ -395,8 +460,6 @@ public class Main {
         }
         Console.promptForExit("Press to exit", "x");
 
-
-
     }
 
     public static void viewPrevYear(){
@@ -443,7 +506,23 @@ public class Main {
         Console.promptForExit("Press to exit", "x");
     }
 
+    public static void customSearch() {
+        String startDate = Console.askForString("Start Date: ");
+        String endDate = Console.askForString("End Date: ");
+        String description = Console.askForString("Description: ");
+        String vendor = Console.askForString("Vendor: ");
+        String amount = Console.askForString("Amount: ");
 
+
+
+    }
+
+//  Send a request to the Openrouter API using the gemini model to analyze & summarize user query and generates a AI powered transaction response.
+
+    /**
+     *
+     * @param userText
+     */
     public static void callOpenAPI(String userText) {
         String openRouterKey = System.getenv("OPENROUTER_API_KEY");
         HttpClient client = HttpClient.newHttpClient();
@@ -452,14 +531,14 @@ public class Main {
                 {
                   "model": "google/gemini-2.5-flash",
                   "messages": [
-                  
+                    
                     {
                       "role": "user",
                       "content": "%s"
                     }
                     {
                       "role" : "assistant"
-                      "content": "You are a expert financial advisor"
+                      "content": "You are a expert financial advisor."
                     }
                   ]
                 }
@@ -484,9 +563,11 @@ public class Main {
 
     }
 
+
+
     public static void useAISummarizer(){
         try {
-            String fileContent = Files.readString(Path.of("src/main/java/com/pluralsight/data/transaction.csv"));
+            String fileContent = Files.readString(Path.of("files/transaction.csv"));
             String userInput = Console.askForString("What would you like to ask the Gemini?");
             System.out.println("Processing your request. Please wait...");
             callOpenAPI(userInput + fileContent);
@@ -495,7 +576,6 @@ public class Main {
         }
 
         Console.promptForExit("Press to exit", "x");
-
 
     }
 

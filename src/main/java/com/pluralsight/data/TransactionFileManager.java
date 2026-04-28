@@ -44,7 +44,7 @@ public class TransactionFileManager {
 
 
                 } catch (Exception e){
-                    System.out.printf(e.getMessage());
+                    System.out.printf("An error occured" + e.getMessage());
                 }
             }
 
