@@ -14,10 +14,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Locale;
 
 public class Main {
     private final static TransactionFileManager transactionFileManager = new TransactionFileManager("src/main/java/com/pluralsight/data/transaction.csv");
@@ -55,13 +53,13 @@ public class Main {
 
                 switch (userInput) {
                     case "D":
-                        addTransaction();
+                        addTransactionOfDeposit();
                         break;
                     case "L":
                         ledgerOptionMenuMsg();
                         break;
                     case "P":
-                        makePayment();
+                        addTransactionOfPayment();
                         break;
                     case "S":
                         useAISummarizer();
@@ -148,13 +146,13 @@ public class Main {
     }
 
 
-    public static void addTransaction() {
+    public static void addTransactionOfDeposit() {
 
         boolean isAddingTransaction = true;
         double convertDepToDouble = 0;
-        boolean isValidAmount = false;
 
-        while (true) {
+
+        while (isAddingTransaction) {
             String depositAmount = Console.askForString("How much are you depositing? (press x to exit): ");
 
             if (depositAmount.equalsIgnoreCase("x")) {
@@ -169,24 +167,22 @@ public class Main {
 
             try {
 
-                double amount  = Double.parseDouble(depositAmount);
+                convertDepToDouble  = Double.parseDouble(depositAmount);
 
-                if (amount < 0){
+                if (convertDepToDouble < 0){
                     System.out.println("You can't deposit a payment of less than $0 silly!");
                     continue;
                 }
 
-                System.out.println("Deposit was accepted. Added: " + amount);
-
+                System.out.printf("Deposit was accepted for the amoutn of: $%.2f \nPlease proceed with filling out the other details. \n", convertDepToDouble);
 
             } catch (Exception e){
-                System.out.println("An error occured and your operation couldn't be converted" + e.getStackTrace());
+                System.out.println("An error occured. " + e.getMessage());
             }
 
 
             String depositDescription = Console.askForString("Description: ");
             String depositVendor = Console.askForString("Vendor/Source of Deposit: ");
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss", Locale.US);
             LocalDate date = LocalDate.now();
             LocalTime time = LocalTime.now().withNano(0);
 
@@ -216,7 +212,7 @@ public class Main {
         }
     }
 
-    public static void makePayment() {
+    public static void addTransactionOfPayment() {
         boolean isMakingPayment = true;
         boolean validAmount = false;
         Double convertDepositToDouble = 0.00;
@@ -363,7 +359,6 @@ public class Main {
         }
     }
 
-    // bug: not printing view previous month.
 
     public static void viewPrevMonth() {
         LocalDate previousMonthStartDate = LocalDate.now().minusMonths(1).withDayOfMonth(1);
@@ -482,8 +477,6 @@ public class Main {
         try {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
             System.out.println(response.body());
-
-
 
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();

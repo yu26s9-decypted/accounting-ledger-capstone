@@ -57,6 +57,13 @@ public class TransactionFileManager {
         return transaction;
     }
 
+
+
+    /**
+     * This writes new transactions to the disk.
+     *
+     */
+
     public void writeNewTransaction(Transaction transaction){
         try {
             FileWriter fileWriter = new FileWriter(this.transactionFileName, true);
