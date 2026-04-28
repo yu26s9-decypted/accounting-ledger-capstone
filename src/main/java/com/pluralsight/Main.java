@@ -151,8 +151,10 @@ public class Main {
     public static void addTransaction() {
 
         boolean isAddingTransaction = true;
+        double convertDepToDouble = 0;
+        boolean isValidAmount = false;
 
-        while (isAddingTransaction) {
+        while (true) {
             String depositAmount = Console.askForString("How much are you depositing? (press x to exit): ");
 
             if (depositAmount.equalsIgnoreCase("x")) {
@@ -160,7 +162,27 @@ public class Main {
                 return;
             }
 
-            Double convertDepToDouble = Double.parseDouble(depositAmount);
+            if(depositAmount.contains("$")){
+                System.out.println("Value cannot include any symbols");
+                continue;
+            }
+
+            try {
+
+                double amount  = Double.parseDouble(depositAmount);
+
+                if (amount < 0){
+                    System.out.println("You can't deposit a payment of less than $0 silly!");
+                    continue;
+                }
+
+                System.out.println("Deposit was accepted. Added: " + amount);
+
+
+            } catch (Exception e){
+                System.out.println("An error occured and your operation couldn't be converted" + e.getStackTrace());
+            }
+
 
             String depositDescription = Console.askForString("Description: ");
             String depositVendor = Console.askForString("Vendor/Source of Deposit: ");
@@ -306,7 +328,6 @@ public class Main {
                     filterByVendor();
                     break;
                 case "6":
-                    customSearch();
                     break;
                 case "0":
                     return;
