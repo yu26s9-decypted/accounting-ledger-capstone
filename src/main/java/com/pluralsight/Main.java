@@ -17,7 +17,6 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Date;
 
 public class Main {
     private final static TransactionFileManager transactionFileManager = new TransactionFileManager("files/transaction.csv");
@@ -245,8 +244,7 @@ public class Main {
            if(userInput == 1){
                 date = LocalDate.now();
                 time = LocalTime.now().withNano(0);
-           } else if  (userInput == 2)
-           {
+           } else if  (userInput == 2) {
                DateTimeFormatter format1 = DateTimeFormatter.ofPattern("M/d/yyyy");
                DateTimeFormatter format2 = DateTimeFormatter.ofPattern("MMMM d yyyy");
                DateTimeFormatter format3 = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -389,6 +387,7 @@ public class Main {
                     filterByVendor();
                     break;
                 case "6":
+                    filterByCustomSearch();
                     break;
                 case "0":
                     return;
@@ -506,22 +505,62 @@ public class Main {
         Console.promptForExit("Press to exit", "x");
     }
 
-    public static void customSearch() {
-        String startDate = Console.askForString("Start Date: ");
-        String endDate = Console.askForString("End Date: ");
-        String description = Console.askForString("Description: ");
-        String vendor = Console.askForString("Vendor: ");
-        String amount = Console.askForString("Amount: ");
+    /**
+     * custom search
+     */
 
 
+    public static void filterByCustomSearch() {
+        boolean validStartDate = false;
+        LocalDate startDate;
+        LocalDate endDate = null;
+        boolean validEndDate = false;
+        
+        
+        while(!validStartDate && !validEndDate) {
+            String askStartDate = Console.askForString("What is the start date (format: 4/4/2026)");
+            DateTimeFormatter format1 = DateTimeFormatter.ofPattern("M/d/yyyy");
 
+            boolean parsedStartDate = false;
+
+
+            try {
+                startDate = LocalDate.parse(askStartDate, format1);
+                parsedStartDate = true;
+            } catch (Exception e){
+                System.out.println("An error occurred." + e.getMessage());
+                continue;
+            }
+
+            validStartDate = true;
+            System.out.println(startDate);
+            
+            String askEndDate = Console.askForString("What is the end date?");
+            boolean parsedEndDate = false;
+            
+            try {
+                endDate = LocalDate.parse(askEndDate, format1);
+                parsedEndDate = true;
+            } catch (Exception e){
+                System.out.println("An error occurred. " + e.getMessage());
+            }
+            
+            validEndDate = true;
+            System.out.println(endDate);
+            
+        }
+
+        
+
+      
+
+        
     }
 
-//  Send a request to the Openrouter API using the gemini model to analyze & summarize user query and generates a AI powered transaction response.
+
 
     /**
-     *
-     * @param userText
+     *  Send a request to the Openrouter API using the gemini model to analyze & summarize user query and generates a AI powered transaction response.
      */
     public static void callOpenAPI(String userText) {
         String openRouterKey = System.getenv("OPENROUTER_API_KEY");
