@@ -19,6 +19,10 @@ public class TransactionFileManager {
         return  transactionFileName;
     }
 
+    /**
+     * Loads all transactions from disk.
+     * @return
+     */
     public ArrayList<Transaction> loadAllTransaction() {
         ArrayList<Transaction> transaction = new ArrayList<>();
         try {
@@ -70,6 +74,5 @@ public class TransactionFileManager {
             System.out.printf(e.getMessage());
         }
     }
-
 
 }

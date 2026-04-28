@@ -5,6 +5,13 @@ import com.pluralsight.data.TransactionFileManager;
 import com.pluralsight.ui.Console;
 import com.pluralsight.ui.PrintFormatUtility;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -18,7 +25,13 @@ public class Main {
 
     public static void main(String[] arg) {
 
-        String accountingLedgerHomeMenuMsg = """
+        if(arg.length > 0 && arg[0].equalsIgnoreCase("--GUI")){
+            //do the gui
+            System.out.println("GUI");
+        }
+        else{
+
+            String accountingLedgerHomeMenuMsg = """
                 
                 WELCOME TO STASH BUSINESS ACCOUNTING.
                 Stash Accounting, a division of Stash Banking, USA.
@@ -30,30 +43,36 @@ public class Main {
                 D.) Add Deposit
                 P.) Make Payment
                 L.) Ledger
+                S.) AI Summarize
                 X.) Exit the application
                 -------------------------------------
                 Enter your command: ›""";
 
-        String userInput;
-        do {
-            System.out.printf("%n %n %n");
-            userInput = Console.askForString(accountingLedgerHomeMenuMsg).toUpperCase();
+            String userInput;
+            do {
+                System.out.printf("%n");
+                userInput = Console.askForString(accountingLedgerHomeMenuMsg).toUpperCase();
 
-            switch (userInput) {
-                case "D":
-                    addTransaction();
-                    break;
-                case "L":
-                    ledgerOptionMenuMsg();
-                    break;
-                case "P":
-                    makePayment();
-                    break;
-                case "X":
-                    return;
-            }
+                switch (userInput) {
+                    case "D":
+                        addTransaction();
+                        break;
+                    case "L":
+                        ledgerOptionMenuMsg();
+                        break;
+                    case "P":
+                        makePayment();
+                        break;
+                    case "S":
+                        useAISummarizer();
+                        break;
+                    case "X":
+                        return;
+                }
 
-        } while (!userInput.equalsIgnoreCase("X") );
+            } while (!userInput.equalsIgnoreCase("X") );
+
+        }
 
     }
 
@@ -107,7 +126,6 @@ public class Main {
         while (true) {
             double spend = 0;
             transaction.sort(Comparator.comparing(Transaction::getDate).reversed());
-            LocalDate today = LocalDate.now();
             int transactionResult = Integer.parseInt(String.valueOf(transaction.size()));
             PrintFormatUtility.printTransactionHeader();
 
@@ -117,6 +135,7 @@ public class Main {
                 PrintFormatUtility.formattedTransaction(t);
                 spend += t.getAmount();
             }
+
             System.out.printf("Total Spend: $%,.2f", spend);
 
 
@@ -148,7 +167,6 @@ public class Main {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss", Locale.US);
             LocalDate date = LocalDate.now();
             LocalTime time = LocalTime.now().withNano(0);
-            String fTime = formatter.format(time);
 
             Transaction addNewTransaction = new Transaction(date, time, depositDescription, depositVendor, convertDepToDouble);
 
@@ -198,13 +216,11 @@ public class Main {
 
         String depositDescription = Console.askForString("Description: ");
         String depositVendor = Console.askForString("Vendor/Source of Deposit: ");
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss", Locale.US);
         LocalDate date = LocalDate.now();
         LocalTime time = LocalTime.now().withNano(0);
 
 
         Transaction addNewTransaction = new Transaction(date, time, depositDescription, depositVendor, convertDepositToDouble);
-
 
         System.out.printf("PLEASE CONFIRM YOUR PAYMENT.");
         PrintFormatUtility.formattedTransaction(addNewTransaction);
@@ -246,9 +262,7 @@ public class Main {
             }
         }
         boolean exit = Console.promptForExit("Press to exit", "x");
-        if (exit) {
-            return;
-        };
+        if (exit);
     }
 
     public static void reportMenuOption() {
@@ -292,7 +306,7 @@ public class Main {
                     filterByVendor();
                     break;
                 case "6":
-                    // Challenge
+                    customSearch();
                     break;
                 case "0":
                     return;
@@ -323,10 +337,8 @@ public class Main {
                 }
             }
 
-            boolean exit =  Console.promptForExit("Press to exit", "x");
-            if(exit){
-                return;
-            }
+            Console.promptForExit("Press to exit", "x");
+
         }
     }
 
@@ -349,10 +361,8 @@ public class Main {
 
 
         }
-        boolean exit = Console.promptForExit("Press to exit", "x");
-        if (exit) {
-            return;
-        }
+       Console.promptForExit("Press to exit", "x");
+
     }
 
     public static void viewYearToDate() {
@@ -367,8 +377,8 @@ public class Main {
             }
 
         }
-        boolean exit = Console.promptForExit("Press to exit", "x");
-        if (exit);
+        Console.promptForExit("Press to exit", "x");
+
 
 
     }
@@ -386,10 +396,8 @@ public class Main {
             }
         }
 
-        boolean exit = Console.promptForExit("Press to exit", "x");
-        if (exit) {
-            return;
-        };
+       Console.promptForExit("Press to exit", "x");
+
 
     }
 
@@ -405,20 +413,76 @@ public class Main {
                     PrintFormatUtility.formattedTransaction(t);
                     vendorExist = true;
                 }
-
             }
 
             if(!vendorExist)
             {
                 System.out.printf("Vendor could not be found. \n");
             }
+
         } catch (Exception e){
             System.out.printf(e.getMessage());
         }
-        boolean exit = Console.promptForExit("Press to exit", "x");
-        if (exit) {
-            return;
-        };
+
+        Console.promptForExit("Press to exit", "x");
+    }
+
+
+    public static void callOpenAPI(String userText) {
+        String openRouterKey = System.getenv("OPENROUTER_API_KEY");
+        HttpClient client = HttpClient.newHttpClient();
+
+        String requestBody = String.format("""
+                {
+                  "model": "google/gemini-2.5-flash",
+                  "messages": [
+                  
+                    {
+                      "role": "user",
+                      "content": "%s"
+                    }
+                    {
+                      "role" : "assistant"
+                      "content": "You are a expert financial advisor"
+                    }
+                  ]
+                }
+                """, userText);
+
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("https://openrouter.ai/api/v1/chat/completions"))
+                .header("Content-Type", "application/json")
+                .header("Authorization", "Bearer " + openRouterKey)
+                .POST(HttpRequest.BodyPublishers.ofString((requestBody)))
+                .build();
+
+
+        try {
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            System.out.println(response.body());
+
+
+
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public static void useAISummarizer(){
+        try {
+            String fileContent = Files.readString(Path.of("src/main/java/com/pluralsight/data/transaction.csv"));
+            String userInput = Console.askForString("What would you like to ask the Gemini?");
+            System.out.println("Processing your request. Please wait...");
+            callOpenAPI(userInput + fileContent);
+        } catch (Exception e) {
+            System.out.println(e.getStackTrace());
+        }
+
+        Console.promptForExit("Press to exit", "x");
+
+
     }
 
 }
