@@ -18,11 +18,14 @@ public class PrintFormatUtility {
                 );
     }
 
-    public static void printTransactionHeader(){
+    public static void printTransactionIntro(){
         System.out.printf("%-12s", "WELCOME TO STASH BUSINESS ACCOUNTING. \n");
         System.out.printf("%-12s", "Stash Accounting, a division of Stash Banking, USA. \n");
         System.out.printf("%-12s", "The bank for innovative companies. \n");
         System.out.printf("\n");
+    }
+
+    public static void printTransactionHeader(){
 
         System.out.printf(
                 "%-12s %-15s %-40s %-25s %15s%n",

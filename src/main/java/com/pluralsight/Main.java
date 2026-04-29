@@ -98,7 +98,13 @@ public class Main {
                 case "A" -> listAllTransaction(transactionLedger);
                 case "D" -> displayDepositTransaction();
                 case "P" -> displayPaymentTransaction();
-                case "R" -> reportMenuOption();
+                case "R" -> {
+                    String r = reportMenuOption();
+
+                    if(r.equalsIgnoreCase("HOME")){
+                        return;
+                    }
+                }
                 case "H" -> {
                     return;
                 }
@@ -346,7 +352,7 @@ public class Main {
         if (exit);
     }
 
-    public static void reportMenuOption() {
+    public static String reportMenuOption() {
         String ledgerReportMenuOption = """
                 \tWELCOME TO STASH BUSINESS ACCOUNTING.
                 
@@ -390,9 +396,9 @@ public class Main {
                     filterByCustomSearch();
                     break;
                 case "0":
-                    return;
+                    return "LEDGER";
                 case "H":
-                    return;
+                    return "HOME";
                 default:
                     System.out.printf("Invalid option");
 
@@ -432,8 +438,6 @@ public class Main {
         PrintFormatUtility.printTransactionHeader();
         for (Transaction t : transactionLedger) {
             LocalDate transactionDate = t.getDate();
-
-
 
             if (transactionDate.isBefore(endMonth) && transactionDate.isAfter(previousMonthStartDate) || transactionDate.isEqual(previousMonthStartDate)) {
                 PrintFormatUtility.formattedTransaction(t);
@@ -511,52 +515,129 @@ public class Main {
 
 
     public static void filterByCustomSearch() {
+        ArrayList<Transaction> matchedTransaction = new ArrayList<>();
         boolean validStartDate = false;
-        LocalDate startDate;
+        LocalDate startDate = null;
         LocalDate endDate = null;
+        boolean parsedStartDate = false;
         boolean validEndDate = false;
-        
-        
-        while(!validStartDate && !validEndDate) {
-            String askStartDate = Console.askForString("What is the start date (format: 4/4/2026)");
-            DateTimeFormatter format1 = DateTimeFormatter.ofPattern("M/d/yyyy");
-
-            boolean parsedStartDate = false;
+        DateTimeFormatter format1 = DateTimeFormatter.ofPattern("M/d/yyyy");
 
 
-            try {
-                startDate = LocalDate.parse(askStartDate, format1);
-                parsedStartDate = true;
-            } catch (Exception e){
-                System.out.println("An error occurred." + e.getMessage());
-                continue;
+
+        while(!validStartDate) {
+
+            while (!parsedStartDate){
+                String askStartDate = Console.askForString("What is the start date (format: 4/4/2026)");
+
+                if(askStartDate.isBlank()){
+                    parsedStartDate = true;
+                    validStartDate = true;
+                    break;
+                }
+
+                try {
+                    startDate = LocalDate.parse(askStartDate, format1);
+                    parsedStartDate = true;
+                    System.out.println(startDate);
+
+                } catch (Exception e){
+                    System.out.println("An error occurred." + e.getMessage());
+
+                }
+
+                validStartDate = true;
+
+
             }
 
-            validStartDate = true;
-            System.out.println(startDate);
-            
-            String askEndDate = Console.askForString("What is the end date?");
-            boolean parsedEndDate = false;
-            
-            try {
-                endDate = LocalDate.parse(askEndDate, format1);
-                parsedEndDate = true;
-            } catch (Exception e){
-                System.out.println("An error occurred. " + e.getMessage());
-            }
-            
-            validEndDate = true;
-            System.out.println(endDate);
-            
         }
 
-        
 
-      
+        boolean parsedEndDate = false;
+        while(!validEndDate){
 
-        
+
+           while(!parsedEndDate){
+               String askEndDate = Console.askForString("What is the end date?");
+
+               if (askEndDate.isBlank()){
+                   parsedEndDate = true;
+                   validEndDate = true;
+                   break;
+               }
+               try {
+                   endDate = LocalDate.parse(askEndDate, format1);
+                   System.out.println(endDate);
+                   parsedEndDate = true;
+
+               } catch (Exception e) {
+                   System.out.println("An error occurred. " + e.getMessage());
+               }
+
+               validEndDate = true;
+           }
+
+        }
+
+        String description = Console.askForString("Description you want to search for");
+        String vendor = Console.askForString("Whats the vendor");
+
+        double amount = 0;
+
+
+
+        boolean valid = false;
+
+        while(!valid){
+            String inputAmount = Console.askForString("Whats the amount?");
+
+            if(inputAmount.isBlank()){
+                valid = true;
+
+            } else {
+                try {
+                    amount = Double.parseDouble(inputAmount);
+                    valid = true;
+                } catch (NumberFormatException e){
+                    System.out.println("This input is invalid please try again");
+                }
+            }
+        }
+
+
+        for(Transaction t: transactionLedger){
+            boolean matchesDateRange =
+                    (startDate == null || !t.getDate().isBefore(startDate)) &&
+                    (endDate == null || !t.getDate().isAfter(endDate));
+            boolean matchesDescription =
+                    description.isBlank() || t.getDescription().toLowerCase().contains(description.toLowerCase());
+            boolean matchesVendor =
+                    vendor.isBlank() || t.getVendor().toLowerCase().contains(vendor.toLowerCase());
+            boolean matchesAmount =
+                    amount == 0 || t.getAmount() == amount;
+
+            if(matchesAmount && matchesDescription && matchesVendor && matchesDateRange){
+                matchedTransaction.add(t);
+            }
+
+        }
+
+        String r = (matchedTransaction.size() <= 1 ? "result" : "results");
+        int matchedArrLength = matchedTransaction.size();
+
+        System.out.printf("Found %d %s\n",matchedArrLength, r);
+
+        PrintFormatUtility.printTransactionHeader();
+
+        for(Transaction t : matchedTransaction){
+            PrintFormatUtility.formattedTransaction(t);
+
+        }
+
+        Console.promptForExit("Press to exit", "x");
+
     }
-
 
 
     /**
@@ -570,7 +651,7 @@ public class Main {
                 {
                   "model": "google/gemini-2.5-flash",
                   "messages": [
-                    
+                
                     {
                       "role": "user",
                       "content": "%s"
