@@ -218,14 +218,21 @@ public class Main {
         LocalTime time  = null;
         while (!validAmount)
         {
+            String paymentAmount = Console.askForString("How much are you paying? (press x to exit): ");
+            if (paymentAmount.equalsIgnoreCase("x")) {
+                System.out.printf("Exiting payment option.");
+                return;
+            }
+
             try {
-                String paymentAmount = Console.askForString("How much are you paying? (press x to exit): ");
+
                 convertDepositToDouble = -Double.parseDouble(paymentAmount);
-                validAmount = true;
-                if (paymentAmount.equalsIgnoreCase("x")) {
-                    System.out.printf("Exiting payment option.");
-                    return;
+                if(Math.abs(convertDepositToDouble) <= 0.0){
+                    System.out.println("Amount can't be less than 0" );
+                    continue;
                 }
+                validAmount = true;
+
 
             } catch (Exception e){
                 System.out.println("Your input was invalid. Please try again");
