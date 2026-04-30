@@ -120,7 +120,13 @@ public class Main {
 
         while (true) {
             double spend = 0;
-            transaction.sort(Comparator.comparing(Transaction::getDate).reversed());
+            transaction.sort(Comparator.comparing(Transaction::getDate)
+                    .thenComparing(Transaction::getTime)
+                    .reversed()
+
+
+
+            );
             int transactionResult = Integer.parseInt(String.valueOf(transaction.size()));
             PrintFormatUtility.printTransactionHeader();
 
@@ -194,6 +200,7 @@ public class Main {
             if (confirmTransaction.equalsIgnoreCase("Y")) {
                 try {
                     transactionFileManager.writeNewTransaction(addNewTransaction);
+                    transactionLedger.add(addNewTransaction);
                     System.out.printf("Your transaction has been saved to the csv.");
                 } catch (Exception e) {
                     System.out.printf(e.getMessage());
@@ -258,11 +265,11 @@ public class Main {
            if(userInput == 1){
                 date = LocalDate.now();
                 time = LocalTime.now().withNano(0);
+                validDate = true;
            } else if  (userInput == 2) {
                DateTimeFormatter format1 = DateTimeFormatter.ofPattern("M/d/yyyy");
                DateTimeFormatter format2 = DateTimeFormatter.ofPattern("MMMM d yyyy");
                DateTimeFormatter format3 = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
 
                boolean parsedDate = false;
 
@@ -324,6 +331,7 @@ public class Main {
         if (confirmTransaction.equalsIgnoreCase("Y")) {
             try {
                 transactionFileManager.writeNewTransaction(addNewTransaction);
+                transactionLedger.add(addNewTransaction);
                 System.out.printf("Your payment transaction has been saved to the csv.");
             } catch (Exception e) {
                 System.out.printf(e.getMessage());
@@ -518,7 +526,7 @@ public class Main {
     }
 
     /**
-     * custom search
+     * Filter the transaction result with a custom search
      */
 
 
@@ -593,10 +601,7 @@ public class Main {
 
         double amount = 0;
 
-
-
         boolean valid = false;
-
         while(!valid){
             String inputAmount = Console.askForString("Whats the amount?");
 
@@ -686,7 +691,7 @@ public class Main {
             System.out.println(response.body());
 
         } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
 
     }
