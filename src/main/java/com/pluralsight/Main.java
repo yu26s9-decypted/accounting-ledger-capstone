@@ -131,7 +131,7 @@ public class Main {
                 spend += t.getAmount();
             }
 
-            System.out.printf("Total Spend: $%,.2f", spend);
+            System.out.printf("Total Spend: $%,.2f\n", spend);
 
 
             boolean exit = Console.promptForExit("Press to exit", "x");
@@ -212,7 +212,6 @@ public class Main {
     }
 
     public static void addTransactionOfPayment() {
-        boolean isMakingPayment = true;
         boolean validAmount = false;
         Double convertDepositToDouble = 0.00;
         LocalDate date = null;
@@ -601,7 +600,6 @@ public class Main {
 
         String description = Console.askForString("Description you want to search for");
         String vendor = Console.askForString("Whats the vendor");
-
         double amount = 0;
 
         boolean valid = false;
