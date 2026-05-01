@@ -1,5 +1,7 @@
 package com.pluralsight.data;
 
+import com.pluralsight.model.Transaction;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -41,18 +43,13 @@ public class TransactionFileManager {
                     Transaction t = new Transaction(transactionDate.toLocalDate(), transactionTime.toLocalTime(), transactionDescription, transactionVendor, transactionAmount);
                     transaction.add(t);
 
-
-
                 } catch (Exception e){
-                    System.out.printf("An error occured" + e.getMessage());
+                    System.out.println("Failed line" + transactionData);
+                    System.out.printf("An error occured and the file couldnt be loaded" + e.getMessage() + e.getStackTrace() + e.getCause());
                 }
             }
-
-
-
-
         } catch (IOException e){
-            System.out.printf("An error occured." + e.getMessage());
+            System.out.println("An error occured. IoException" + e.getMessage());
         }
         return transaction;
     }

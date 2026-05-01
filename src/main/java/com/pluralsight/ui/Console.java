@@ -6,7 +6,6 @@ public class Console {
 
     public static final Scanner scanner = new Scanner(System.in);
 
-
     public static double askForDouble(String prompt) {
         while(true) {
             try {

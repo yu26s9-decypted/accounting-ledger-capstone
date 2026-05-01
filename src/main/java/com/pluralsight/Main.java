@@ -1,6 +1,6 @@
 package com.pluralsight;
 
-import com.pluralsight.data.Transaction;
+import com.pluralsight.model.Transaction;
 import com.pluralsight.data.TransactionFileManager;
 import com.pluralsight.ui.Console;
 import com.pluralsight.ui.PrintFormatUtility;
@@ -22,8 +22,7 @@ public class Main {
     private final static TransactionFileManager transactionFileManager = new TransactionFileManager("files/transaction.csv");
     private static ArrayList<Transaction> transactionLedger = transactionFileManager.loadAllTransaction();
 
-    public static void main(String[] arg)
-    {
+    public static void main(String[] arg) {
 
         if(arg.length > 0 && arg[0].equalsIgnoreCase("--GUI")){
             //do the gui
@@ -71,7 +70,10 @@ public class Main {
 
     }
 
-// Ledger Options
+    /**
+     * Ledger Options
+      */
+
 
     public static void ledgerOptionMenuMsg()
     {
@@ -229,6 +231,11 @@ public class Main {
             if (paymentAmount.equalsIgnoreCase("x")) {
                 System.out.printf("Exiting payment option.");
                 return;
+            }
+
+            if(paymentAmount.contains("$") || paymentAmount.contains("-")){
+                System.out.println("Value cannot include any symbols");
+                continue;
             }
 
             try {
@@ -426,7 +433,7 @@ public class Main {
 
     public static void viewMonthToDateReport() {
 
-        while (true){
+
             LocalDate today = LocalDate.now();
             LocalDate startOfMoth = today.withDayOfMonth(1);
 
@@ -435,14 +442,13 @@ public class Main {
             for (Transaction t : transactionLedger){
                 LocalDate transactionDate = t.getDate();
 
-                if(transactionDate.isBefore(today) && transactionDate.isAfter(startOfMoth)){
+                if((transactionDate.isBefore(today) || transactionDate.isEqual(today)) && (transactionDate.isAfter(startOfMoth) || transactionDate.isEqual(startOfMoth))){
                     PrintFormatUtility.formattedTransaction(t);
                 }
             }
-
             Console.promptForExit("Press to exit", "x");
 
-        }
+
     }
 
 
@@ -461,7 +467,8 @@ public class Main {
 
 
         }
-       Console.promptForExit("Press to exit", "x");
+        Console.promptForExit("Press to exit", "x");
+
 
     }
 
@@ -563,7 +570,6 @@ public class Main {
                 }
 
                 validStartDate = true;
-
 
             }
 

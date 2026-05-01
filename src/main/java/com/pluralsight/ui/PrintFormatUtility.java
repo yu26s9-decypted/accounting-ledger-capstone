@@ -1,6 +1,6 @@
 package com.pluralsight.ui;
 
-import com.pluralsight.data.Transaction;
+import com.pluralsight.model.Transaction;
 
 public class PrintFormatUtility {
     public static void formattedTransaction(Transaction t){
