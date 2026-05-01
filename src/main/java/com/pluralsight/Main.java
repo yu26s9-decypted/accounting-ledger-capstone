@@ -1,5 +1,7 @@
 package com.pluralsight;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pluralsight.model.Transaction;
 import com.pluralsight.data.TransactionFileManager;
 import com.pluralsight.ui.Console;
@@ -666,6 +668,7 @@ public class Main {
         String openRouterKey = System.getenv("OPENROUTER_API_KEY");
         HttpClient client = HttpClient.newHttpClient();
 
+
         String requestBody = String.format("""
                 {
                   "model": "google/gemini-2.5-flash",
@@ -674,10 +677,10 @@ public class Main {
                     {
                       "role": "user",
                       "content": "%s"
-                    }
+                    },
                     {
-                      "role" : "assistant"
-                      "content": "You are a expert financial advisor."
+                      "role" : "system"
+                      "content": "You are a expert financial advisor. Do not include any markdown language. It must be in plain text."
                     }
                   ]
                 }
@@ -694,7 +697,19 @@ public class Main {
 
         try {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            System.out.println(response.body());
+
+            ObjectMapper map = new ObjectMapper();
+            JsonNode r = map.readTree(response.body());
+            String message = r
+                    .path("choices")
+                    .get(0)
+                    .path("message")
+                    .path("content")
+                    .asText();
+
+            System.out.println(message);
+
+
 
         } catch (IOException | InterruptedException e) {
             System.out.println(e.getMessage());
