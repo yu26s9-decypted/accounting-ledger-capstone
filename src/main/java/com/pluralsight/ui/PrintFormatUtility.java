@@ -2,15 +2,17 @@ package com.pluralsight.ui;
 
 import com.pluralsight.model.Transaction;
 
+import java.time.format.DateTimeFormatter;
+
 public class PrintFormatUtility {
     public static void formattedTransaction(Transaction t){
 
         String sign = ((t.getAmount()) < 0 ? "-" : "");
-
+        DateTimeFormatter formatTime = DateTimeFormatter.ofPattern("HH:mm:ss");
 
         System.out.printf("%-12s %-15s %-40s %-25s %10s$%.2f%n",
                 t.getDate(),
-                t.getTime(),
+                t.getTime().format(formatTime),
                 t.getDescription(),
                 t.getVendor(),
                 sign,

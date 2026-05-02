@@ -93,8 +93,8 @@ public class Main {
             switch (userInput)
             {
                 case "A" -> listAllTransaction(transactionLedger);
-                case "D" -> displayDepositTransaction();
-                case "P" -> displayPaymentTransaction();
+                case "D" -> displayDepositTransaction(transactionLedger);
+                case "P" -> displayPaymentTransaction(transactionLedger);
                 case "R" -> {
                     String r = reportMenuOption();
 
@@ -120,9 +120,6 @@ public class Main {
             transaction.sort(Comparator.comparing(Transaction::getDate)
                     .thenComparing(Transaction::getTime)
                     .reversed()
-
-
-
             );
             int transactionResult = Integer.parseInt(String.valueOf(transaction.size()));
             PrintFormatUtility.printTransactionHeader();
@@ -174,7 +171,7 @@ public class Main {
                     continue;
                 }
 
-                System.out.printf("Deposit was accepted for the amoutn of: $%.2f \nPlease proceed with filling out the other details. \n", convertDepToDouble);
+                System.out.printf("Deposit was accepted for the amount of: $%.2f \nPlease proceed with filling out the other details. \n", convertDepToDouble);
 
             } catch (Exception e){
                 System.out.println("An error occured. " + e.getMessage());
@@ -253,7 +250,6 @@ public class Main {
         String transactionTimeOption = """
                 \tWhat time do you want to log?
                 
-                
                 \t[1] Current Time
                 \t[2] Custom Time
                 
@@ -326,7 +322,7 @@ public class Main {
 
         Transaction addNewTransaction = new Transaction(date, time, depositDescription, depositVendor, convertDepositToDouble);
 
-        System.out.printf("PLEASE CONFIRM YOUR PAYMENT.");
+        System.out.printf("PLEASE CONFIRM YOUR PAYMENT. \n");
         PrintFormatUtility.formattedTransaction(addNewTransaction);
         String confirmTransaction = Console.askForString("Confirm this payment? (y/n): ");
 
@@ -346,7 +342,11 @@ public class Main {
 
     //    Display deposits only
 
-    public static void displayDepositTransaction() {
+    public static void displayDepositTransaction(ArrayList<Transaction> transaction) {
+        transaction.sort(Comparator.comparing(Transaction::getDate)
+                .thenComparing(Transaction::getTime)
+                .reversed()
+        );
         for (Transaction t : transactionLedger) {
             if (t.getAmount() > 0) {
                 PrintFormatUtility.formattedTransaction(t);
@@ -360,7 +360,11 @@ public class Main {
 
     // Display payment transaction
 
-    public static void displayPaymentTransaction() {
+    public static void displayPaymentTransaction(ArrayList<Transaction> transaction) {
+        transaction.sort(Comparator.comparing(Transaction::getDate)
+                .thenComparing(Transaction::getTime)
+                .reversed()
+        );
         for (Transaction t : transactionLedger) {
             if (t.getAmount() < 0) {
                 PrintFormatUtility.formattedTransaction(t);
@@ -434,6 +438,7 @@ public class Main {
 
             System.out.printf("Month to Date Overview: %s Month: %s %n", today, startOfMoth);
 
+            PrintFormatUtility.printTransactionHeader();
             for (Transaction t : transactionLedger){
                 LocalDate transactionDate = t.getDate();
 
@@ -471,7 +476,6 @@ public class Main {
         LocalDate today = LocalDate.now();
         LocalDate previousYear = LocalDate.now().withDayOfYear(1);
         PrintFormatUtility.printTransactionHeader();
-
         for(Transaction t : transactionLedger) {
             LocalDate transactionDate = t.getDate();
             if (transactionDate.isBefore(today) && transactionDate.isAfter(previousYear)) {
@@ -510,6 +514,7 @@ public class Main {
             for (Transaction t : transactionLedger)
             {
                 if(t.getVendor().equalsIgnoreCase(userSearchTerm)){
+                    PrintFormatUtility.printTransactionHeader();
                     PrintFormatUtility.formattedTransaction(t);
                     vendorExist = true;
                 }
@@ -563,11 +568,8 @@ public class Main {
                     System.out.println("An error occurred." + e.getMessage());
 
                 }
-
                 validStartDate = true;
-
             }
-
         }
 
 
@@ -653,13 +655,6 @@ public class Main {
 
     }
 
-
-    /**
-     *  Send a request to the Openrouter API using the gemini model to analyze & summarize user query and generates a AI powered transaction response.
-     */
-
-
-
     public static void useAISummarizer(){
         try {
             String fileContent = Files.readString(Path.of("files/transaction.csv"));
@@ -667,7 +662,7 @@ public class Main {
             System.out.println("Processing your request. Please wait...");
             AiService.callOpenAPI(userInput + fileContent);
         } catch (Exception e) {
-            System.out.println(e.getStackTrace());
+            System.out.println("An error occured." + e.getMessage());
         }
 
         Console.promptForExit("Press to exit", "x");

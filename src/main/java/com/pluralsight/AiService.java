@@ -9,6 +9,11 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
 public class AiService {
+
+    /**
+     *  Send a request to the Openrouter API using the gemini model to analyze & summarize user query and generates a AI powered transaction response.
+     */
+
     public static void callOpenAPI(String userText) {
         String openRouterKey = System.getenv("OPENROUTER_API_KEY");
         HttpClient client = HttpClient.newHttpClient();
